@@ -4,12 +4,13 @@ import { IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
 import {
   ILoginUser,
+  ILoginUserResponse,
   IRefreshTokenResponse,
   ISignupUserResponse,
 } from './auth.interface';
 import { jwtHelpers } from '../../../helpers/jwtHelper';
 import config from '../../../config';
-import { JwtPayload, Secret } from 'jsonwebtoken';
+import { Secret } from 'jsonwebtoken';
 
 //create a new user
 const createUser = async (user: IUser): Promise<ISignupUserResponse> => {
@@ -40,12 +41,8 @@ const createUser = async (user: IUser): Promise<ISignupUserResponse> => {
   };
 };
 
-const loginUser = async (
-  payload: ILoginUser,
-  user: JwtPayload | null
-): Promise<Partial<IUser> | null> => {
+const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { email, password } = payload;
-  const userId = user?._id;
 
   const isUserExist = await User.isUserExist(email);
 
@@ -60,13 +57,24 @@ const loginUser = async (
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
   }
 
-  if (isUserExist?._id?.toString() !== userId?.toString()) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
-  }
+  //create access token & refresh token
+  const { _id, role } = isUserExist;
+  const accessToken = jwtHelpers.createToken(
+    { _id, role },
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string
+  );
 
-  const data = await User.findOne({ email }, { _id: 0, fullName: 1, email: 1 });
+  const refreshToken = jwtHelpers.createToken(
+    { _id, role },
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expires_in as string
+  );
 
-  return data;
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
