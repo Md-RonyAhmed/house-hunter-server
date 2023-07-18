@@ -48,13 +48,19 @@ const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 }));
 const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loginData = __rest(req.body, []);
-    const user = req.user;
-    const data = yield auth_service_1.AuthService.loginUser(loginData, user);
+    const data = yield auth_service_1.AuthService.loginUser(loginData);
+    const { refreshToken } = data, others = __rest(data, ["refreshToken"]);
+    // set refresh token into cookie
+    const cookieOptions = {
+        secure: config_1.default.env === 'production',
+        httpOnly: true,
+    };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
     (0, sendApiResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: 'User logged in successfully!',
-        data,
+        data: others,
     });
 }));
 const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -31,10 +31,8 @@ const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     return Object.assign(Object.assign({}, createdUser.toObject()), { accessToken,
         refreshToken });
 });
-const loginUser = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = payload;
-    const userId = user === null || user === void 0 ? void 0 : user._id;
     const isUserExist = yield user_model_1.User.isUserExist(email);
     if (!isUserExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
@@ -43,11 +41,14 @@ const loginUser = (payload, user) => __awaiter(void 0, void 0, void 0, function*
         !(yield user_model_1.User.isPasswordMatched(password, isUserExist.password))) {
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'Password is incorrect');
     }
-    if (((_a = isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist._id) === null || _a === void 0 ? void 0 : _a.toString()) !== (userId === null || userId === void 0 ? void 0 : userId.toString())) {
-        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'Unauthorized access');
-    }
-    const data = yield user_model_1.User.findOne({ email }, { _id: 0, fullName: 1, email: 1 });
-    return data;
+    //create access token & refresh token
+    const { _id, role } = isUserExist;
+    const accessToken = jwtHelper_1.jwtHelpers.createToken({ _id, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
+    const refreshToken = jwtHelper_1.jwtHelpers.createToken({ _id, role }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
+    return {
+        accessToken,
+        refreshToken,
+    };
 });
 const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
     //verify token
