@@ -32,10 +32,9 @@ const house_constant_1 = require("./house.constant");
 const pagination_1 = require("../../../constants/pagination");
 const pick_1 = __importDefault(require("../../../shared/pick"));
 const createHouse = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const house = __rest(req.body, []);
-    const ownerId = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id;
-    const data = yield house_service_1.HouseService.createHouse(house, ownerId);
+    const owner = req === null || req === void 0 ? void 0 : req.user;
+    const data = yield house_service_1.HouseService.createHouse(house, owner);
     (0, sendApiResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,

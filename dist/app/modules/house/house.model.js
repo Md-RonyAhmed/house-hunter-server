@@ -15,5 +15,11 @@ const HouseSchema = new mongoose_1.Schema({
     rentPerMonth: { type: Number, required: true },
     phoneNumber: { type: String, required: true },
     description: { type: String },
+    ownerId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true,
+    },
 });
 exports.House = (0, mongoose_1.model)('House', HouseSchema);
