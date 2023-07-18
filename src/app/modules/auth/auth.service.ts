@@ -4,13 +4,12 @@ import { IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
 import {
   ILoginUser,
-  ILoginUserResponse,
   IRefreshTokenResponse,
   ISignupUserResponse,
 } from './auth.interface';
 import { jwtHelpers } from '../../../helpers/jwtHelper';
 import config from '../../../config';
-import { Secret } from 'jsonwebtoken';
+import { JwtPayload, Secret } from 'jsonwebtoken';
 
 //create a new user
 const createUser = async (user: IUser): Promise<ISignupUserResponse> => {
@@ -41,8 +40,12 @@ const createUser = async (user: IUser): Promise<ISignupUserResponse> => {
   };
 };
 
-const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
+const loginUser = async (
+  payload: ILoginUser,
+  user: JwtPayload | null
+): Promise<Partial<IUser> | null> => {
   const { email, password } = payload;
+  const userId = user?._id;
 
   const isUserExist = await User.isUserExist(email);
 
@@ -57,24 +60,13 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
   }
 
-  //create access token & refresh token
-  const { _id, role } = isUserExist;
-  const accessToken = jwtHelpers.createToken(
-    { _id, role },
-    config.jwt.secret as Secret,
-    config.jwt.expires_in as string
-  );
+  if (isUserExist?._id?.toString() !== userId?.toString()) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+  }
 
-  const refreshToken = jwtHelpers.createToken(
-    { _id, role },
-    config.jwt.refresh_secret as Secret,
-    config.jwt.refresh_expires_in as string
-  );
+  const data = await User.findOne({ email }, { _id: 0, fullName: 1, email: 1 });
 
-  return {
-    accessToken,
-    refreshToken,
-  };
+  return data;
 };
 
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {

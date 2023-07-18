@@ -4,11 +4,8 @@ import catchAsync from '../../../shared/catchAsync';
 import sendApiResponse from '../../../shared/sendApiResponse';
 import { AuthService } from './auth.service';
 import config from '../../../config';
-import {
-  ILoginUserResponse,
-  IRefreshTokenResponse,
-  ISignupUserResponse,
-} from './auth.interface';
+import { IRefreshTokenResponse, ISignupUserResponse } from './auth.interface';
+import { IUser } from '../user/user.interface';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { ...user } = req.body;
@@ -33,23 +30,14 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body;
-  const data = await AuthService.loginUser(loginData);
-  const { refreshToken, ...others } = data;
+  const user = req.user;
+  const data = await AuthService.loginUser(loginData, user);
 
-  //   set refresh token into cookie
-
-  const cookieOptions = {
-    secure: config.env === 'production',
-    httpOnly: true,
-  };
-
-  res.cookie('refreshToken', refreshToken, cookieOptions);
-
-  sendApiResponse<ILoginUserResponse>(res, {
+  sendApiResponse<Partial<IUser | null>>(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'User logged in successfully!',
-    data: others,
+    data,
   });
 });
 
