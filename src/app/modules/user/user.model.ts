@@ -57,12 +57,29 @@ UserSchema.statics.isPasswordMatched = async function (
 
 UserSchema.pre('save', async function (next) {
   if (this.isNew) {
-    const isExist = await User.findOne({
+    const isExistPhone = await User.findOne({
       phoneNumber: this.phoneNumber,
+    });
+    const isExistEmail = await User.findOne({
       email: this.email,
     });
-    if (isExist) {
-      throw new ApiError(httpStatus.CONFLICT, 'The user already exists!');
+    if (isExistPhone && isExistEmail) {
+      throw new ApiError(
+        httpStatus.CONFLICT,
+        'The user already exists with this phoneNumber and email!'
+      );
+    }
+    if (isExistEmail) {
+      throw new ApiError(
+        httpStatus.CONFLICT,
+        'The user already exists with this email!'
+      );
+    }
+    if (isExistPhone) {
+      throw new ApiError(
+        httpStatus.CONFLICT,
+        'The user already exists with this phoneNumber!'
+      );
     }
   }
   next();
