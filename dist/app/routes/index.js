@@ -2,24 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_route_1 = require("../modules/auth/auth.route");
-// import { UserRoutes } from '../modules/user/user.route';
-// import { CowRoutes } from '../modules/cow/cow.route';
-// import { OrderRoutes } from '../modules/order/order.route';
-// import { AdminRoutes } from '../modules/admin/admin.route';
+const house_route_1 = require("../modules/house/house.route");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
         path: '/auth',
         route: auth_route_1.AuthRoutes,
     },
-    //   {
-    //     path: '/users',
-    // //     route: UserRoutes,
-    //   },
-    //   {
-    //     path: '/house',
-    // //     route: HouseRoutes,
-    //   },
+    {
+        path: '/house',
+        route: house_route_1.HouseRoutes,
+    },
     //   {
     //     path: '/booking',
     // //     route: BookingRoutes,
