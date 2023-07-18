@@ -8,6 +8,7 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { houseSearchableFields } from './house.constant';
 import { SortOrder } from 'mongoose';
 import { JwtPayload } from 'jsonwebtoken';
+import { validatePhoneNumber } from '../user/user.utils';
 
 export const createHouse = async (
   house: IHouse,
@@ -17,6 +18,13 @@ export const createHouse = async (
     ...house,
     ownerId: owner?._id,
   });
+
+  const { phoneNumber } = house;
+  if (!validatePhoneNumber(phoneNumber)) {
+    throw new Error(
+      'Invalid phone number. Only Bangladeshi phone numbers with 11 digits are allowed.'
+    );
+  }
 
   if (!createdHouse) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create House!');
