@@ -7,19 +7,21 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { houseSearchableFields } from './house.constant';
 import { SortOrder } from 'mongoose';
+import { JwtPayload } from 'jsonwebtoken';
 
 export const createHouse = async (
   house: IHouse,
-  ownerId: string
+  owner: JwtPayload | null
 ): Promise<IHouse | null> => {
   const createdHouse = await House.create({
     ...house,
-    ownerId,
+    ownerId: owner?._id,
   });
 
   if (!createdHouse) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create House!');
   }
+
   return createdHouse;
 };
 

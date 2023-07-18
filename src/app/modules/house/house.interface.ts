@@ -24,6 +24,7 @@ export interface IHouse {
   rentPerMonth: number;
   phoneNumber: string;
   description?: string;
+  ownerId?: string;
 }
 
 export type IHouseFilters = {

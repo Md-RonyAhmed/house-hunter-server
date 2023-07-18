@@ -10,8 +10,8 @@ import pick from '../../../shared/pick';
 
 const createHouse = catchAsync(async (req: Request, res: Response) => {
   const { ...house } = req.body;
-  const ownerId = req?.user?._id;
-  const data = await HouseService.createHouse(house, ownerId);
+  const owner = req?.user;
+  const data = await HouseService.createHouse(house, owner);
 
   sendApiResponse<IHouse>(res, {
     success: true,
