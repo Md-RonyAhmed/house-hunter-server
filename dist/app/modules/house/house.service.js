@@ -29,8 +29,13 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const house_model_1 = require("./house.model");
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const house_constant_1 = require("./house.constant");
+const user_utils_1 = require("../user/user.utils");
 const createHouse = (house, owner) => __awaiter(void 0, void 0, void 0, function* () {
     const createdHouse = yield house_model_1.House.create(Object.assign(Object.assign({}, house), { ownerId: owner === null || owner === void 0 ? void 0 : owner._id }));
+    const { phoneNumber } = house;
+    if (!(0, user_utils_1.validatePhoneNumber)(phoneNumber)) {
+        throw new Error('Invalid phone number. Only Bangladeshi phone numbers with 11 digits are allowed.');
+    }
     if (!createdHouse) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create House!');
     }
