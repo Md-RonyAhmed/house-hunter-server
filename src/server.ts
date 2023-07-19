@@ -36,3 +36,11 @@ async function connectDB() {
 }
 
 connectDB();
+
+// handle signals termination
+process.on('SIGTERM', () => {
+  console.info('SIGTERM is received');
+  if (server) {
+    server.close();
+  }
+});

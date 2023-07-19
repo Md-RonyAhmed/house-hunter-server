@@ -15,7 +15,7 @@ const createHouse = catchAsync(async (req: Request, res: Response) => {
 
   sendApiResponse<IHouse>(res, {
     success: true,
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     message: 'House added successfully!',
     data,
   });
