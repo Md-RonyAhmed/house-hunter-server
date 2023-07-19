@@ -63,7 +63,7 @@ const getAllHouse = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
                 if (field === 'rentPerMonthMin' || field === 'rentPerMonthMax') {
                     return {
                         rentPerMonth: {
-                            [`$${field.includes('Min') ? 'gte' : 'lte'}`]: value,
+                            [`$${field.endsWith('Min') ? 'gte' : 'lte'}`]: value,
                         },
                     };
                 }
