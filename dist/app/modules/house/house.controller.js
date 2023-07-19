@@ -37,7 +37,7 @@ const createHouse = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
     const data = yield house_service_1.HouseService.createHouse(house, owner);
     (0, sendApiResponse_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.CREATED,
+        statusCode: http_status_1.default.OK,
         message: 'House added successfully!',
         data,
     });
